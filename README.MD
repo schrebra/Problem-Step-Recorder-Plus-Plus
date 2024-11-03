@@ -108,6 +108,6 @@ This is a powerful screenshot tool that lets you:
 - Includes base64-encoded icon data
 - Implements strict mode for error handling
 
-
+Message me if you want a compiled executable
 
 
