@@ -1,5 +1,5 @@
 
-# PSR++ (Problem Steps Recorder Plus Plus)
+# PSR++
 
 ![image](https://github.com/user-attachments/assets/03b512b6-173f-41e2-9687-6bd494d926f5)
 
