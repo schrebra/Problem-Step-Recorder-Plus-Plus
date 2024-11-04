@@ -1,7 +1,7 @@
 
 # PSR++
 
-https://github.com/schrebra/PSR/blob/main/PSR%2B%2B.png
+https://raw.githubusercontent.com/schrebra/PSR/refs/heads/main/PSR%2B%2B.png
 
 ## Background
 This is a modernized replacement for Microsoft's Problem Steps Recorder (PSR), which was discontinued in newer Windows versions. PSR was a valuable tool that IT professionals and users relied on to document technical issues.
