@@ -109,6 +109,13 @@ This is a powerful screenshot tool that lets you:
 - Includes base64-encoded icon data
 - Implements strict mode for error handling
 
-
+## Future Change Log
+- [Fix] - Remove small boarder around screenshots
+- [Feature] - Add screenshot outline color and size. Include toggle as well
+- [Improvement] - Hide preview pane until screenshot is captured
+- [Feature] - Include settings menu bar to export profile configured settings to program path.
+- [Feature] - Include settings menu bar for import configured profile settings.
+- [Feature] - Create cfg file for overall settings to auto import from last session
+- [Bug] - Fix clipboard screenshot when copying into markdown - It slightly shrinks the screenshot
 
 
