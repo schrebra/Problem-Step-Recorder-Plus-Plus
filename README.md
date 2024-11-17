@@ -3,7 +3,8 @@
 
 ![image](https://github.com/user-attachments/assets/559dcd44-2e3c-462c-aa6d-b181d28d78b2)
 
-![06-24 11 17_10 50 57](https://github.com/user-attachments/assets/25da6ee1-73a6-4cef-9f8d-71a8b68c0e51)
+![08-24 11 17_10 52 21](https://github.com/user-attachments/assets/c13e1700-68d2-474d-8144-659238e419cc)
+
 
 ![09-24 11 17_11 00 59](https://github.com/user-attachments/assets/e67dcf43-d2ee-4c8e-bff1-d9b9a72077a2)
 
