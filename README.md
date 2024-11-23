@@ -1,5 +1,8 @@
 
-# PSR++
+# Problem Step Recorder++
+
+## Background
+This is a modernized replacement for Microsoft's Problem Steps Recorder (PSR), which was discontinued in newer Windows versions. PSR was a valuable tool that IT professionals and users relied on to document technical issues.
 
 ![image](https://github.com/user-attachments/assets/559dcd44-2e3c-462c-aa6d-b181d28d78b2)
 
@@ -8,9 +11,6 @@
 
 ![09-24 11 17_11 00 59](https://github.com/user-attachments/assets/e67dcf43-d2ee-4c8e-bff1-d9b9a72077a2)
 
-
-## Background
-This is a modernized replacement for Microsoft's Problem Steps Recorder (PSR), which was discontinued in newer Windows versions. PSR was a valuable tool that IT professionals and users relied on to document technical issues.
 
 ## What Was PSR?
 - A built-in Windows tool that recorded step-by-step actions
