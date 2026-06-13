@@ -28,7 +28,7 @@ PSR++ goes far beyond standard print-screen functionality.
 
 ### 🎯 Visual Enhancements & Tracking
 * **Hardware Cursor Capture:** Visually record the actual Windows cursor state.
-* **Mouse Highlighting:** Draw highly customizable, translucent highlights (circles or cross-hairs) directly over click coordinates to make instructions crystal clear.
+* **Mouse Highlighting:** Draw highly customizable, translucent highlights directly over click coordinates to make instructions crystal clear.
 * **Window Outlining:** Automatically draw a customizable border around the active element or window you are interacting with.
 * **Complete Style Control:** Sliders and color-pickers to adjust outline width, highlight size, colors, and opacity levels. 
 
