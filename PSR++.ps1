@@ -1,6 +1,7 @@
 # ==============================================================================
 # PROGRAM: Problem Step Recorder Plus (PSR++)
 # PLATFORM: Windows PowerShell 5.1+ & Windows Presentation Foundation (WPF)
+# AUTHOR: Gemini Enterprise Mission Support
 # DESCRIPTION: A high-performance screen capturing utility optimized for secure,
 #              rapid step-recording and visual software audits. Features an
 #              interactive session preview sidebar and automatic clipboard copying.
@@ -33,6 +34,9 @@ public class Win32 {
     [DllImport("user32.dll")] public static extern IntPtr GetDC(IntPtr hWnd);
     [DllImport("user32.dll")] public static extern int ReleaseDC(IntPtr hWnd, IntPtr hDC);
     [DllImport("gdi32.dll")] public static extern int GetDeviceCaps(IntPtr hdc, int nIndex);
+    [DllImport("user32.dll", CharSet = CharSet.Auto)] public static extern IntPtr SendMessage(IntPtr hWnd, int Msg, IntPtr wParam, IntPtr lParam);
+    public const int WM_SETICON = 0x0080;
+    public const int ICON_SMALL = 0;
     [StructLayout(LayoutKind.Sequential)]
     public struct CURSORINFO { public int cbSize; public int flags; public IntPtr hCursor; public Point ptScreenPos; }
     public const int CURSOR_SHOWING = 0x00000001;
@@ -55,7 +59,7 @@ if (-not (Test-Path $screenshotPath)) { New-Item -ItemType Directory -Path $scre
  $captureFolder = $screenshotPath
  $global:lastCapturePath = $null; $global:isCapturing = $false; $global:wasMouseDown = $false
  $global:outlineColor = [System.Drawing.Color]::FromArgb(0, 255, 0); $global:delayTimer = $null
- $global:continuousMode = $false; $global:stopCapture = $false
+ $global:continuousMode = $false; $global:stopCapture = $false; $global:preparingCapture = $false
  $global:mouseHighlightColor = [System.Drawing.Color]::FromArgb(255, 165, 0)
  $global:mouseHighlightOpacity = 127; $global:mouseHighlightSize = 50
  $global:showMouseCursor = $true; $global:showMouseHighlight = $true; $global:captureCounter = 1
@@ -108,15 +112,6 @@ function Out-IniFile {
     $Data | ConvertTo-Json -Depth 5 | Out-File $FilePath -Encoding utf8 -Force
 }
  $icon = "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tAAONbQADjW0hw41tLUONbQODjW0ALu7uwC7u7sfu7u74Lu7u/+7u7v/uLi4/6enp/+lpaX/pqam6aamplinp6cBETu8AAs3vVkLN739Cze9/ws3vf8LN72uCze9BAs3vQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAONbQADjW0KA41tOUONbSQDjW0AQ41tAAAAAAAvLy8ALy8vB+8vLzgvLy8/729vf+6urr/qKio/6ampv+np6f/pqam6aKiolgALswACje/bgo3v/8KN7//Cje//wo3v6EKN74BCje/AAAAAAAAAAAAAAAAAAAAAAAAAAAADjW0AA41tAAONbRlDjW07Q41tDkONbQAAAAAAAAAAAC+vr4Avr6+H76+vuC+vr7/vr6+/7u7u/2pqan8p6en/6enp/+kpKT/m5ub542NjVQJN8GZCTfC/wk3wv8JN8L/CTfBhgk3wgAJN8EAAAAAAAAAAAAAAAAAAAAAAAAAAAAONbQADjW0AA41tKAONbTGDjW0DQ41tAAAAAAAAAAAAL+/vwC/v78fv7+/4b+/v/+/v7//wMDA/8fHx//JycnftLS0Taenp8ioqKj/p6en/6SkpP+enp7/lZWV/4mJiP9wdYP7GEG5+Ac3xf8IOMT/CDjE/wg4xP8IOMT/CDjEdgg4xAAJN8QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA41tAAONbQDDjW0qA41tP8ONbRxDjW0AA41tAAAAAAAAAAAAAAAAAAAAAAAAAAAAMDAwADAwMAewMDA4cDAwP/AwMD/wMDA/8HBwf/b29v/5ubm/+SwGf/8B/A//8DwAf///+D4f/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8="
-function Get-WpfIcon {
-    param([string]$base64String)
-    $bytes = [Convert]::FromBase64String($base64String)
-    $ms = New-Object System.IO.MemoryStream($bytes, 0, $bytes.Length)
-    $bi = New-Object System.Windows.Media.Imaging.BitmapImage
-    $bi.BeginInit(); $bi.StreamSource = $ms; $bi.CacheOption = [System.Windows.Media.Imaging.BitmapCacheOption]::OnLoad; $bi.EndInit(); $bi.Freeze()
-    $ms.Close()
-    return $bi
-}
  $xaml = @'
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="PSR++" Height="700" Width="1050" MaxWidth="{Binding Source={x:Static SystemParameters.WorkArea}, Path=Width}" MaxHeight="{Binding Source={x:Static SystemParameters.WorkArea}, Path=Height}" WindowStartupLocation="CenterScreen" Background="#F5F5F5" ResizeMode="CanMinimize" UseLayoutRounding="True" SnapsToDevicePixels="True">
     <Grid Margin="20">
@@ -237,7 +232,21 @@ function Get-WpfIcon {
  $pictureBox = $window.FindName("pictureBox"); $copyMenuItem = $window.FindName("copyMenuItem")
  $elementsListBox = $window.FindName("elementsListBox"); $sidebarBorder = $window.FindName("sidebarBorder")
  $thumbnailStack = $window.FindName("thumbnailStack"); $clipboardStatusLabel = $window.FindName("clipboardStatusLabel")
- $window.Icon = Get-WpfIcon -base64String $icon
+# ==============================================================================
+# SECTION 4: NATIVE TITLE BAR ICON ASSIGNMENT (WM_SETICON)
+# Sets ONLY the title bar icon without overriding the taskbar icon.
+# ==============================================================================
+ $window.add_SourceInitialized({
+    try {
+        $bytes = [Convert]::FromBase64String($icon)
+        $ms = New-Object System.IO.MemoryStream($bytes, 0, $bytes.Length)
+        $drawingIcon = New-Object System.Drawing.Icon($ms)
+        $hWnd = (New-Object System.Windows.Interop.WindowInteropHelper $window).Handle
+        [Win32]::SendMessage($hWnd, [Win32]::WM_SETICON, [Win32]::ICON_SMALL, $drawingIcon.Handle) | Out-Null
+    } catch {
+        Write-DebugLog "Failed to set title bar icon: $_"
+    }
+})
 function Get-WpfBrush {
     param([System.Drawing.Color]$drawingColor)
     $mediaColor = [System.Windows.Media.Color]::FromRgb($drawingColor.R, $drawingColor.G, $drawingColor.B)
@@ -421,24 +430,27 @@ function Draw-CursorHighlight {
 # ==============================================================================
  $captureButton.add_Click({
     try {
-        if (-not $global:isCapturing) {
-            $global:isCapturing = $true
-            $global:wasMouseDown = $true
+        if (-not $global:isCapturing -and -not $global:preparingCapture) {
+            $global:preparingCapture = $true
             $captureButton.Content = "Cancel Capture"
             $statusLabel.Text = "Preparing capture..."
             Write-DebugLog "Started single capture routine."
+            $window.WindowState = [System.Windows.WindowState]::Minimized
             if ($global:delayTimer) { $global:delayTimer.Stop() }
             $global:delayTimer = New-Object System.Windows.Threading.DispatcherTimer
             $global:delayTimer.Interval = [System.TimeSpan]::FromSeconds(1)
             $global:delayTimer.add_Tick({
                 $global:delayTimer.Stop()
+                $global:preparingCapture = $false
+                $global:isCapturing = $true
+                $global:wasMouseDown = $true
                 $statusLabel.Text = "Capturing active... Click on target window."
-                $window.WindowState = [System.Windows.WindowState]::Minimized
                 Write-DebugLog "Window minimized. Ready to capture click."
             })
             $global:delayTimer.Start()
         } else {
             $global:isCapturing = $false
+            $global:preparingCapture = $false
             $captureButton.Content = "Single Capture"
             $statusLabel.Text = "Capture cancelled"
             $window.WindowState = [System.Windows.WindowState]::Normal
@@ -451,28 +463,28 @@ function Draw-CursorHighlight {
     }
 })
  $continuousModeButton.add_Click({
-    if (-not $global:continuousMode) {
-        # Show the dialog FIRST, before enabling capturing to prevent the dialog's own click from being captured
-        [System.Windows.MessageBox]::Show("Press the ESC button to stop recording.", "Continuous Capture", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information)
-        
-        $global:continuousMode = $true; $global:isCapturing = $true; $global:stopCapture = $false
-        $global:wasMouseDown = $true # Ensure the mouse click on the dialog doesn't trigger capture
+    if (-not $global:continuousMode -and -not $global:preparingCapture) {
+        $global:preparingCapture = $true
+        $global:continuousMode = $true; $global:stopCapture = $false
         $continuousModeButton.Content = "Stop Capturing"; $captureButton.IsEnabled = $false
         $statusLabel.Text = "Preparing continuous capture..."
         Write-DebugLog "Started continuous capture routine."
-        
+        [System.Windows.MessageBox]::Show("Press the ESC button to stop recording.", "Continuous Capture", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information)
+        $window.WindowState = [System.Windows.WindowState]::Minimized
         if ($global:delayTimer) { $global:delayTimer.Stop() }
         $global:delayTimer = New-Object System.Windows.Threading.DispatcherTimer
         $global:delayTimer.Interval = [System.TimeSpan]::FromSeconds(1)
         $global:delayTimer.add_Tick({
             $global:delayTimer.Stop()
+            $global:preparingCapture = $false
+            $global:isCapturing = $true
+            $global:wasMouseDown = $true
             $statusLabel.Text = "Continuous Capture active. Click on elements. Press ESC to stop."
-            $window.WindowState = [System.Windows.WindowState]::Minimized
             Write-DebugLog "Window minimized. Ready to capture continuous clicks."
         })
         $global:delayTimer.Start()
     } else {
-        $global:stopCapture = $true; $global:continuousMode = $false; $global:isCapturing = $false
+        $global:stopCapture = $true; $global:continuousMode = $false; $global:isCapturing = $false; $global:preparingCapture = $false
         $continuousModeButton.Content = "Continuous Capture"; $captureButton.IsEnabled = $true
         $window.WindowState = [System.Windows.WindowState]::Normal
         $statusLabel.Text = "Saved to $screenshotPath"
