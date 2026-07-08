@@ -1,5 +1,5 @@
 
-# PSR++ (Problem Step Recorder Plus)
+# Problem Step Recorder Plus
 
 This is a modernized, high-performance replacement for Microsoft's Problem Steps Recorder (PSR), which was discontinued in newer Windows versions. PSR was a valuable tool that IT professionals and everyday users relied on to document technical issues. PSR++ fills that gap, acting as a super-powered version of the Windows Snipping Tool equipped with advanced tracking, automated storage, and an interactive modern interface. 
 
