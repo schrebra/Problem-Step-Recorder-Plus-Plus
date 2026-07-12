@@ -5,7 +5,7 @@ This is a modernized, high-performance replacement for Microsoft's Problem Steps
 
 ---
 
-<img width="1045" height="695" alt="image" src="https://github.com/user-attachments/assets/f10a2e16-96c0-4e3c-aed1-28a00c4eb6d9" />
+<img width="60%" alt="image" src="https://github.com/user-attachments/assets/aea06c13-047c-4f4e-bed5-42430819e354" />
 
 ## 📖 The Backstory
 
